@@ -5,9 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#000000">
 <title>기억</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
   :root {
     --bg: #000;
@@ -21,12 +19,14 @@
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { background: var(--bg); color: var(--ink); min-height: 100%; }
   body {
-    font-family: "Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    font-family: "Pretendard Variable", Pretendard, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    letter-spacing: -0.02em;
     -webkit-font-smoothing: antialiased;
   }
   button, input, textarea { font: inherit; color: inherit; background: none; border: 0; outline: none; }
   button { cursor: pointer; }
-  :focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 14px; }
+  button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+  input:focus-visible, textarea:focus-visible { outline: none; }
 
   .wrap { max-width: 720px; margin: 0 auto; padding: 28px 22px 140px; }
 
@@ -37,17 +37,17 @@
   }
   .cats::-webkit-scrollbar { display: none; }
   .cat {
-    flex: none; font-size: 19px; padding: 10px 20px; border-radius: 999px;
+    flex: none; font-size: 19px; font-weight: 600; padding: 10px 20px; border-radius: 999px;
     color: var(--soft); background: transparent;
     transition: background .35s var(--ease), color .35s var(--ease), transform .25s var(--spring);
   }
   .cat:active { transform: scale(.93); }
-  .cat.on { background: var(--ink); color: #000; }
+  .cat.on { background: var(--ink); color: #000; font-weight: 700; }
   .cat.plus { font-size: 22px; padding: 8px 16px; color: var(--faint); }
   .cat.plus:hover { color: var(--soft); }
   .newcat {
     flex: none; width: 140px; font-size: 19px; padding: 10px 20px; border-radius: 999px;
-    background: var(--sheet); animation: grow .4s var(--spring);
+    background: #2a2a2a; color: var(--ink); animation: grow .4s var(--spring);
   }
   @keyframes grow { from { width: 40px; opacity: 0; } }
 
@@ -66,10 +66,10 @@
     from { opacity: 0; transform: translateY(-14px) scale(.96); filter: blur(6px); }
   }
   .text {
-    font-size: 30px; line-height: 1.55; white-space: pre-wrap;
+    font-size: 29px; font-weight: 700; line-height: 1.45; letter-spacing: -0.03em; white-space: pre-wrap;
     word-break: keep-all; overflow-wrap: anywhere;
   }
-  .who { font-size: 17px; color: var(--soft); margin-top: 8px; }
+  .who { font-size: 17px; font-weight: 500; color: var(--soft); margin-top: 8px; }
   .del {
     font-size: 15px; color: var(--soft); margin-top: 10px; padding: 6px 12px;
     border-radius: 999px; background: var(--sheet);
@@ -111,7 +111,7 @@
   body.writing .dim { opacity: 1; pointer-events: auto; }
   body.writing .sheet { transform: none; transition-timing-function: var(--spring); }
   .sheet textarea {
-    display: block; width: 100%; font-size: 26px; line-height: 1.5; min-height: 120px; resize: none;
+    display: block; width: 100%; font-size: 26px; font-weight: 600; line-height: 1.5; min-height: 120px; resize: none;
   }
   .sheet input {
     width: 100%; font-size: 18px; padding: 14px 0 4px; margin-top: 10px;
@@ -120,7 +120,7 @@
   ::placeholder { color: #555; }
   .save {
     position: absolute; left: 22px; bottom: calc(26px + env(safe-area-inset-bottom));
-    height: 66px; padding: 0 30px; border-radius: 999px; font-size: 20px;
+    height: 66px; padding: 0 30px; border-radius: 999px; font-size: 20px; font-weight: 700;
     background: #2c2c2c; color: var(--soft);
     transition: background .25s, color .25s, transform .3s var(--spring);
   }
