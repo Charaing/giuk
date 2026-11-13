@@ -2,62 +2,152 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
 <title>기억</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { background: #000; color: #fff; }
+  :root {
+    --bg: #000;
+    --ink: #f4f4f2;
+    --soft: #8c8c8c;
+    --faint: #3a3a3a;
+    --sheet: #1a1a1a;
+    --spring: cubic-bezier(.34, 1.4, .5, 1);
+    --ease: cubic-bezier(.22, 1, .36, 1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { background: var(--bg); color: var(--ink); min-height: 100%; }
   body {
-    font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-    max-width: 760px; margin: 0 auto; padding: 24px 16px 40px;
+    font-family: "Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
-  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
-  input, textarea {
-    font: inherit; color: #fff; background: #111; border: 1px solid #333;
-    border-radius: 10px; padding: 14px 16px; width: 100%; outline: none;
-  }
-  input:focus, textarea:focus { border-color: #fff; }
+  button, input, textarea { font: inherit; color: inherit; background: none; border: 0; outline: none; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 14px; }
+
+  .wrap { max-width: 720px; margin: 0 auto; padding: 28px 22px 140px; }
 
   /* 카테고리 */
-  .cats { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px; }
+  .cats {
+    display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
+    margin: 0 -22px 34px; padding: 4px 22px;
+  }
+  .cats::-webkit-scrollbar { display: none; }
   .cat {
-    font-size: 20px; padding: 10px 18px; border: 1px solid #444; border-radius: 999px; color: #aaa;
+    flex: none; font-size: 19px; padding: 10px 20px; border-radius: 999px;
+    color: var(--soft); background: transparent;
+    transition: background .35s var(--ease), color .35s var(--ease), transform .25s var(--spring);
   }
-  .cat.on { background: #fff; color: #000; border-color: #fff; font-weight: 700; }
-  .cat.add { border-style: dashed; }
-
-  /* 입력 */
-  .form { display: grid; gap: 10px; margin-bottom: 36px; }
-  .form textarea { font-size: 24px; min-height: 110px; resize: vertical; line-height: 1.5; }
-  .form input { font-size: 18px; }
-  .form .go {
-    font-size: 22px; font-weight: 700; background: #fff; color: #000;
-    border-radius: 10px; padding: 14px;
+  .cat:active { transform: scale(.93); }
+  .cat.on { background: var(--ink); color: #000; }
+  .cat.plus { font-size: 22px; padding: 8px 16px; color: var(--faint); }
+  .cat.plus:hover { color: var(--soft); }
+  .newcat {
+    flex: none; width: 140px; font-size: 19px; padding: 10px 20px; border-radius: 999px;
+    background: var(--sheet); animation: grow .4s var(--spring);
   }
+  @keyframes grow { from { width: 40px; opacity: 0; } }
 
   /* 목록 */
-  .item { padding: 26px 0; border-top: 1px solid #222; position: relative; }
-  .text { font-size: 30px; line-height: 1.5; white-space: pre-wrap; word-break: keep-all; overflow-wrap: anywhere; padding-right: 36px; }
-  .who { font-size: 17px; color: #888; margin-top: 10px; }
-  .who::before { content: "— "; }
-  .del { position: absolute; top: 26px; right: 0; font-size: 22px; color: #444; }
-  .del:hover { color: #fff; }
-  .empty { color: #555; font-size: 22px; text-align: center; padding: 60px 0; }
-  .rmcat { font-size: 15px; color: #555; margin-top: 40px; }
-  .rmcat:hover { color: #fff; }
+  .list { transition: opacity .2s ease, transform .3s var(--ease); }
+  .list.swap { opacity: 0; transform: translateY(8px); }
+  .item {
+    padding: 22px 0 26px; cursor: default;
+    display: grid; grid-template-rows: 1fr;
+    transition: grid-template-rows .4s var(--ease), opacity .3s ease, padding .4s var(--ease);
+  }
+  .item > div { overflow: hidden; }
+  .item.gone { grid-template-rows: 0fr; opacity: 0; padding: 0; }
+  .item.fresh { animation: pop .7s var(--spring); }
+  @keyframes pop {
+    from { opacity: 0; transform: translateY(-14px) scale(.96); filter: blur(6px); }
+  }
+  .text {
+    font-size: 30px; line-height: 1.55; white-space: pre-wrap;
+    word-break: keep-all; overflow-wrap: anywhere;
+  }
+  .who { font-size: 17px; color: var(--soft); margin-top: 8px; }
+  .del {
+    font-size: 15px; color: var(--soft); margin-top: 10px; padding: 6px 12px;
+    border-radius: 999px; background: var(--sheet);
+    opacity: 0; transform: translateY(-4px); pointer-events: none;
+    transition: opacity .25s ease, transform .3s var(--ease), background .2s, color .2s;
+  }
+  .item.open .del { opacity: 1; transform: none; pointer-events: auto; }
+  .del.sure { background: #3a1414; color: #ffb4b4; }
+
+  .empty { padding: 70px 0; text-align: center; color: var(--faint); font-size: 22px; line-height: 1.7; }
+  .empty button { font-size: 15px; color: var(--soft); margin-top: 18px; text-decoration: underline; text-underline-offset: 4px; }
+
+  /* 플러스 버튼 */
+  .fab {
+    position: fixed; right: max(22px, calc(50vw - 338px)); bottom: calc(26px + env(safe-area-inset-bottom));
+    width: 66px; height: 66px; border-radius: 50%;
+    background: var(--ink); color: #000; z-index: 20;
+    display: grid; place-items: center;
+    box-shadow: 0 10px 40px rgba(255,255,255,.12);
+    transition: transform .45s var(--spring);
+  }
+  .fab:active { transform: scale(.9); }
+  .fab svg { width: 28px; height: 28px; transition: transform .45s var(--spring); }
+  body.writing .fab svg { transform: rotate(135deg); }
+
+  /* 입력 시트 */
+  .dim {
+    position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 10;
+    opacity: 0; pointer-events: none; transition: opacity .35s ease;
+    backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+  }
+  .sheet {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 15;
+    max-width: 720px; margin: 0 auto;
+    background: var(--sheet); border-radius: 28px 28px 0 0;
+    padding: 26px 22px calc(110px + env(safe-area-inset-bottom));
+    transform: translateY(105%); transition: transform .5s var(--ease);
+  }
+  body.writing .dim { opacity: 1; pointer-events: auto; }
+  body.writing .sheet { transform: none; transition-timing-function: var(--spring); }
+  .sheet textarea {
+    display: block; width: 100%; font-size: 26px; line-height: 1.5; min-height: 120px; resize: none;
+  }
+  .sheet input {
+    width: 100%; font-size: 18px; padding: 14px 0 4px; margin-top: 10px;
+    border-top: 1px solid #2c2c2c; color: var(--ink);
+  }
+  ::placeholder { color: #555; }
+  .save {
+    position: absolute; left: 22px; bottom: calc(26px + env(safe-area-inset-bottom));
+    height: 66px; padding: 0 30px; border-radius: 999px; font-size: 20px;
+    background: #2c2c2c; color: var(--soft);
+    transition: background .25s, color .25s, transform .3s var(--spring);
+  }
+  .save.ready { background: var(--ink); color: #000; }
+  .save:active { transform: scale(.94); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; }
+  }
 </style>
 </head>
 <body>
-  <div class="cats" id="cats"></div>
+  <main class="wrap">
+    <nav class="cats" id="cats"></nav>
+    <section class="list" id="list"></section>
+  </main>
 
-  <form class="form" id="form">
-    <textarea id="text" placeholder="기억할 것"></textarea>
-    <input id="who" placeholder="누가 한 말? (선택)">
-    <button class="go">추가</button>
+  <div class="dim" id="dim"></div>
+  <form class="sheet" id="sheet" aria-hidden="true">
+    <textarea id="text" placeholder="기억할 말을 적어줘"></textarea>
+    <input id="who" placeholder="누가 한 말이야? (안 적어도 돼)" autocomplete="off">
+    <button class="save" id="save" type="submit">추가</button>
   </form>
 
-  <div id="list"></div>
-  <button class="rmcat" id="rmcat">이 카테고리 삭제</button>
+  <button class="fab" id="fab" aria-label="새 글 추가">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+  </button>
 
 <script>
 const KEY = "giuk-v1";
@@ -66,53 +156,102 @@ try { db = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
 if (!db || !db.cats) db = { cats: ["기본"], items: [], cur: "기본" };
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) {} };
 const $ = id => document.getElementById(id);
-const esc = s => s.replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+let freshId = null;
 
-function render() {
+function renderCats() {
   if (!db.cats.includes(db.cur)) db.cur = db.cats[0];
   $("cats").innerHTML =
     db.cats.map(c => `<button class="cat ${c === db.cur ? "on" : ""}" data-c="${esc(c)}">${esc(c)}</button>`).join("") +
-    `<button class="cat add" id="addcat">+</button>`;
+    `<button class="cat plus" id="addcat" aria-label="카테고리 추가">+</button>`;
+}
+
+function renderList() {
   const items = db.items.filter(i => i.cat === db.cur);
   $("list").innerHTML = items.length
-    ? items.map(i => `<div class="item">
-        <div class="text">${esc(i.text)}</div>
-        ${i.who ? `<div class="who">${esc(i.who)}</div>` : ""}
-        <button class="del" data-id="${i.id}" title="삭제">×</button>
-      </div>`).join("")
-    : `<div class="empty">아직 없음</div>`;
-  $("rmcat").style.display = db.cats.length > 1 ? "" : "none";
+    ? items.map(i => `<article class="item ${i.id === freshId ? "fresh" : ""}" data-id="${i.id}"><div>
+        <p class="text">${esc(i.text)}</p>
+        ${i.who ? `<p class="who">${esc(i.who)}</p>` : ""}
+        <button class="del" type="button">지우기</button>
+      </div></article>`).join("")
+    : `<div class="empty">여기는 아직 비어 있어<br>아래 + 를 눌러 적어봐
+        ${db.cats.length > 1 ? `<br><button id="rmcat">이 카테고리 지우기</button>` : ""}</div>`;
+  freshId = null;
+}
+
+function render() { renderCats(); renderList(); }
+
+function switchTo(c) {
+  if (c === db.cur) return;
+  db.cur = c; save(); renderCats();
+  const l = $("list"); l.classList.add("swap");
+  setTimeout(() => { renderList(); l.classList.remove("swap"); }, 180);
 }
 
 $("cats").onclick = e => {
   const b = e.target.closest("button"); if (!b) return;
   if (b.id === "addcat") {
-    const n = (prompt("카테고리 이름") || "").trim();
-    if (n && !db.cats.includes(n)) { db.cats.push(n); db.cur = n; }
-  } else db.cur = b.dataset.c;
-  save(); render();
+    const inp = document.createElement("input");
+    inp.className = "newcat"; inp.placeholder = "이름";
+    b.replaceWith(inp); inp.focus();
+    let done = false;
+    const finish = ok => {
+      if (done) return; done = true;
+      const n = inp.value.trim();
+      if (ok && n && !db.cats.includes(n)) { db.cats.push(n); save(); renderCats(); switchTo(n); }
+      else renderCats();
+    };
+    inp.onkeydown = ev => { if (ev.key === "Enter") finish(true); if (ev.key === "Escape") finish(false); };
+    inp.onblur = () => finish(true);
+  } else switchTo(b.dataset.c);
 };
 
-$("form").onsubmit = e => {
+/* 시트 */
+const open = () => {
+  document.body.classList.add("writing"); $("sheet").setAttribute("aria-hidden", "false");
+  setTimeout(() => $("text").focus(), 120);
+};
+const close = () => {
+  document.body.classList.remove("writing"); $("sheet").setAttribute("aria-hidden", "true");
+  document.activeElement.blur();
+};
+$("fab").onclick = () => document.body.classList.contains("writing") ? close() : open();
+$("dim").onclick = close;
+document.addEventListener("keydown", e => { if (e.key === "Escape") close(); });
+$("text").oninput = () => $("save").classList.toggle("ready", !!$("text").value.trim());
+$("text").onkeydown = e => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) $("sheet").requestSubmit(); };
+
+$("sheet").onsubmit = e => {
   e.preventDefault();
-  const text = $("text").value.trim(); if (!text) return;
-  db.items.unshift({ id: Date.now(), cat: db.cur, text, who: $("who").value.trim() });
-  $("text").value = ""; $("who").value = "";
-  save(); render(); $("text").focus();
+  const text = $("text").value.trim(); if (!text) { $("text").focus(); return; }
+  const item = { id: Date.now(), cat: db.cur, text, who: $("who").value.trim() };
+  db.items.unshift(item); freshId = item.id; save();
+  $("text").value = ""; $("who").value = ""; $("save").classList.remove("ready");
+  close();
+  setTimeout(() => { renderList(); window.scrollTo({ top: 0, behavior: "smooth" }); }, 220);
 };
 
+/* 글 누르면 지우기 버튼, 두 번 누르면 삭제 */
 $("list").onclick = e => {
-  const b = e.target.closest(".del"); if (!b) return;
-  if (!confirm("지울까?")) return;
-  db.items = db.items.filter(i => i.id != b.dataset.id);
-  save(); render();
-};
-
-$("rmcat").onclick = () => {
-  if (!confirm(`'${db.cur}' 카테고리와 안의 글 전부 지울까?`)) return;
-  db.items = db.items.filter(i => i.cat !== db.cur);
-  db.cats = db.cats.filter(c => c !== db.cur);
-  save(); render();
+  if (e.target.id === "rmcat") {
+    db.cats = db.cats.filter(c => c !== db.cur);
+    db.items = db.items.filter(i => i.cat !== db.cur);
+    db.cur = db.cats[0]; save(); render(); return;
+  }
+  const item = e.target.closest(".item"); if (!item) return;
+  const del = e.target.closest(".del");
+  if (del) {
+    if (!del.classList.contains("sure")) { del.classList.add("sure"); del.textContent = "정말 지울까?"; return; }
+    item.classList.add("gone");
+    db.items = db.items.filter(i => i.id != item.dataset.id); save();
+    setTimeout(() => { if (!db.items.some(i => i.cat === db.cur)) renderList(); else item.remove(); }, 420);
+    return;
+  }
+  document.querySelectorAll(".item.open").forEach(x => {
+    if (x !== item) { x.classList.remove("open"); const d = x.querySelector(".del"); d.classList.remove("sure"); d.textContent = "지우기"; }
+  });
+  item.classList.toggle("open");
+  if (!item.classList.contains("open")) { const d = item.querySelector(".del"); d.classList.remove("sure"); d.textContent = "지우기"; }
 };
 
 render();
