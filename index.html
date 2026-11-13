@@ -96,11 +96,12 @@
     background: var(--ink); color: #000; z-index: 20;
     display: grid; place-items: center;
     box-shadow: 0 10px 40px rgba(255,255,255,.12);
-    transition: transform .45s var(--spring);
+    transition: transform .45s var(--spring), opacity .25s ease;
   }
   .fab:active { transform: scale(.9); }
   .fab svg { width: 28px; height: 28px; transition: transform .45s var(--spring); }
   body.writing .fab svg { transform: rotate(135deg); }
+  body.setting .fab { transform: scale(0); opacity: 0; pointer-events: none; }
 
   /* 입력 시트 */
   .dim {
