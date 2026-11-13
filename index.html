@@ -322,9 +322,9 @@ $("setsheet").onsubmit = e => {
 };
 
 /* 제미나이로 띄어쓰기·맞춤법 교정
-   2.5 플래시를 먼저 쓰고, 구글이 그 모델을 안 주면(404) 공식 후속 모델로 넘어감 */
+   하이드로젠을 먼저 쓰고, 구글이 그 모델을 안 주면(404) 다음 모델로 넘어감 */
 const MODELS = [
-  { id: "gemini-2.5-flash", gen: { temperature: 0, thinkingConfig: { thinkingBudget: 0 } } },
+  { id: "gemini-4-hydrogen", gen: { temperature: 0, thinkingConfig: { thinkingLevel: "low" } } },
   { id: "gemini-3.5-flash-lite", gen: { temperature: 0 } }
 ];
 const PROMPT =
