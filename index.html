@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>기억</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #000; color: #fff; }
+  body {
+    font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    max-width: 760px; margin: 0 auto; padding: 24px 16px 40px;
+  }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  input, textarea {
+    font: inherit; color: #fff; background: #111; border: 1px solid #333;
+    border-radius: 10px; padding: 14px 16px; width: 100%; outline: none;
+  }
+  input:focus, textarea:focus { border-color: #fff; }
+
+  /* 카테고리 */
+  .cats { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px; }
+  .cat {
+    font-size: 20px; padding: 10px 18px; border: 1px solid #444; border-radius: 999px; color: #aaa;
+  }
+  .cat.on { background: #fff; color: #000; border-color: #fff; font-weight: 700; }
+  .cat.add { border-style: dashed; }
+
+  /* 입력 */
+  .form { display: grid; gap: 10px; margin-bottom: 36px; }
+  .form textarea { font-size: 24px; min-height: 110px; resize: vertical; line-height: 1.5; }
+  .form input { font-size: 18px; }
+  .form .go {
+    font-size: 22px; font-weight: 700; background: #fff; color: #000;
+    border-radius: 10px; padding: 14px;
+  }
+
+  /* 목록 */
+  .item { padding: 26px 0; border-top: 1px solid #222; position: relative; }
+  .text { font-size: 30px; line-height: 1.5; white-space: pre-wrap; word-break: keep-all; overflow-wrap: anywhere; padding-right: 36px; }
+  .who { font-size: 17px; color: #888; margin-top: 10px; }
+  .who::before { content: "— "; }
+  .del { position: absolute; top: 26px; right: 0; font-size: 22px; color: #444; }
+  .del:hover { color: #fff; }
+  .empty { color: #555; font-size: 22px; text-align: center; padding: 60px 0; }
+  .rmcat { font-size: 15px; color: #555; margin-top: 40px; }
+  .rmcat:hover { color: #fff; }
+</style>
+</head>
+<body>
+  <div class="cats" id="cats"></div>
+
+  <form class="form" id="form">
+    <textarea id="text" placeholder="기억할 것"></textarea>
+    <input id="who" placeholder="누가 한 말? (선택)">
+    <button class="go">추가</button>
+  </form>
+
+  <div id="list"></div>
+  <button class="rmcat" id="rmcat">이 카테고리 삭제</button>
+
+<script>
+const KEY = "giuk-v1";
+let db;
+try { db = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
+if (!db || !db.cats) db = { cats: ["기본"], items: [], cur: "기본" };
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) {} };
+const $ = id => document.getElementById(id);
+const esc = s => s.replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+
+function render() {
+  if (!db.cats.includes(db.cur)) db.cur = db.cats[0];
+  $("cats").innerHTML =
+    db.cats.map(c => `<button class="cat ${c === db.cur ? "on" : ""}" data-c="${esc(c)}">${esc(c)}</button>`).join("") +
+    `<button class="cat add" id="addcat">+</button>`;
+  const items = db.items.filter(i => i.cat === db.cur);
+  $("list").innerHTML = items.length
+    ? items.map(i => `<div class="item">
+        <div class="text">${esc(i.text)}</div>
+        ${i.who ? `<div class="who">${esc(i.who)}</div>` : ""}
+        <button class="del" data-id="${i.id}" title="삭제">×</button>
+      </div>`).join("")
+    : `<div class="empty">아직 없음</div>`;
+  $("rmcat").style.display = db.cats.length > 1 ? "" : "none";
+}
+
+$("cats").onclick = e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.id === "addcat") {
+    const n = (prompt("카테고리 이름") || "").trim();
+    if (n && !db.cats.includes(n)) { db.cats.push(n); db.cur = n; }
+  } else db.cur = b.dataset.c;
+  save(); render();
+};
+
+$("form").onsubmit = e => {
+  e.preventDefault();
+  const text = $("text").value.trim(); if (!text) return;
+  db.items.unshift({ id: Date.now(), cat: db.cur, text, who: $("who").value.trim() });
+  $("text").value = ""; $("who").value = "";
+  save(); render(); $("text").focus();
+};
+
+$("list").onclick = e => {
+  const b = e.target.closest(".del"); if (!b) return;
+  if (!confirm("지울까?")) return;
+  db.items = db.items.filter(i => i.id != b.dataset.id);
+  save(); render();
+};
+
+$("rmcat").onclick = () => {
+  if (!confirm(`'${db.cur}' 카테고리와 안의 글 전부 지울까?`)) return;
+  db.items = db.items.filter(i => i.cat !== db.cur);
+  db.cats = db.cats.filter(c => c !== db.cur);
+  save(); render();
+};
+
+render();
+</script>
+</body>
+</html>
